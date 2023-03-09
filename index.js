@@ -29,7 +29,7 @@ async function sendName(name) {
     const docRef = await addDoc(collection(db, "scoreboard"), {
       time: Date.now(),
       nickname: name,
-      score: 90, //replace with score
+      score: score, //replace with score
     });
     console.log("Document written with ID: ", docRef.id);
   } catch (e) {
@@ -46,24 +46,24 @@ function handleInput(e) {
 
 function view() {
   return html`<h1>Nickname</h1>
-    <p>Press ENTER key to submit name BEFORE viewing scores</p>
-    <input type="text" value="PLAYER" @keydown=${handleInput} /><br><br>
-    <input type="button" value="View Scores" @click=${getHighScores} />`;
+    <div id="name-container">
+      <p>Press ENTER key to submit name BEFORE viewing scores</p>
+      <input type="text" value="PLAYER" @keydown=${handleInput} /><br><br>
+      <input type="button" value="View Scores" @click=${getHighScores} />
+    </div>`;
 }
 
 function scoreView() {
   return html`<h1>Leaderboard</h1>
     <div id="scoreboard-container">
+      <input type="button" value="Play Again" @click=${resetGame} /><br><br>
       ${scoreboard.map((s) => html`<div class="score">${s.nickname}, ${s.score}</div>`)}
-    </div>
-    <input type="button" value="Play Again" @click=${nameView} />`;
+    </div>`;
 }
 
 function nameView() {
   render(view(), document.body);
 }
-
-nameView();
 
 async function getHighScores() {
   scoreboard = [];
@@ -110,9 +110,9 @@ function view() {
 
 render(view(), document.body);
 */
-/*
+
 //the game
-let kitty, kittyImg, asteroids, asteroidImg, survivalTime, score, tutorialOver;
+let kitty, kittyImg, asteroids, asteroidImg, survivalTime, score, alive=true;
 
 window.preload = () => {
 //function preload() {
@@ -126,7 +126,7 @@ window.preload = () => {
 
 window.setup = () => {
 //function setup() {
-  new Canvas(windowWidth, windowHeight);
+  new Canvas(windowWidth, windowHeight*3/4);
   survivalTime = 0;
   setInterval(timer,1000);
   createAsteroids();
@@ -137,19 +137,18 @@ window.draw = () => {
   background(color(11, 11, 70)); // fixes kitty image trail
 
   fill(255); //white
-  textSize(24);
+  textSize(20);
   textAlign(CENTER);
-  if (tutorialOver) {
-    text('Help space kitty! You can do it!', width / 2, height / 16);
-  } else {
-    text('Move your mouse to avoid the asteroids!', width / 2, height / 16);
-  }
+  text('Move your mouse to avoid the asteroids!', width / 2, height / 16);
 
   kitty.position.x = mouseX;
   kitty.position.y = mouseY;
   //kitty.moveTowards(mouse);
-
-  text('Time: ' + survivalTime + ' seconds', width / 2, height*2 / 16);
+  if (alive) {
+    text('Time: ' + survivalTime + ' seconds', width / 2, height*2 / 16);
+  } else {
+    text('Submit your scores below to play again!', width / 2, height / 2);
+  }
 
   // from p5play.org demos
   for (let a of asteroids) {
@@ -162,13 +161,14 @@ window.draw = () => {
 
   if (kitty.collides(asteroids)) {
     score = survivalTime;
-    render(view(), document.body);
-    resetGame();
+    asteroids.remove();
+    alive = false;
+    nameView();
   }
 }
 
-window.createAsteroids = () => {
-//function createAsteroids() {
+//window.createAsteroids = () => {
+function createAsteroids() {
   for (let i = 0; i < 10; i++) {
     let a = new asteroids.Sprite(random(width), height, 64);
     a.speed = 2;
@@ -178,11 +178,10 @@ window.createAsteroids = () => {
   }
 }
 
-window.resetGame = () => {
-//function resetGame() {
-  asteroids.remove();
+//window.resetGame = () => {
+function resetGame() {
   survivalTime = 0;
-  tutorialOver = true;
+  alive = true;
   createAsteroids();
 }
 
@@ -195,4 +194,3 @@ window.windowResized = () => {
 //function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
-*/
